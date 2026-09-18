@@ -1,0 +1,38 @@
+import argparse
+
+CAMPS = {
+    "easy_radiant": 60, "medium_radiant": 60, "hard_radiant": 60,
+    "easy_dire": 60, "medium_dire": 60, "hard_dire": 60
+}
+
+def calculate_stack_time(game_time_sec, camp_name):
+    respawn_interval = CAMPS.get(camp_name)
+    if respawn_interval is None:
+        return None
+    cycles = (game_time_sec // respawn_interval) + 1
+    next_respawn = cycles * respawn_interval
+    return next_respawn - 55, next_respawn - 45, next_respawn
+
+def format_time(seconds):
+    return f"{seconds // 60}:{seconds % 60:02d}"
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--time", type=int, required=True)
+    parser.add_argument("--camp", type=str, required=True)
+    args = parser.parse_args()
+
+    result = calculate_stack_time(args.time, args.camp)
+    if not result:
+        print(f"Ошибка: лагерь '{args.camp}' не найден. Доступные: {', '.join(CAMPS.keys())}")
+        return
+
+    start, end, respawn = result
+    print(f"--- {args.camp} ---")
+    print(f"Время игры: {args.time} сек ({format_time(args.time)})")
+    print(f"Респаун: {respawn} сек ({format_time(respawn)})")
+    print(f"Окно для стака: {start}–{end} сек")
+    print(f"Бей крипа: {format_time(start)}–{format_time(end)}")
+
+if __name__ == "__main__":
+    main()
